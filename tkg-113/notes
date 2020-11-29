@@ -16,6 +16,16 @@ tkg config cluster my-cluster --plan=prod --controlplane-machine-count=3 --worke
 tkg create cluster my-cluster --plan dev --dry-run > my-cluster-config.yaml
 tkg config cluster mj-tkgc01 --plan dev --controlplane-machine-count 1 --worker-machine-count 3 --namespace development --controlplane-size small --worker-size small > dev.yaml
 
+# Use a tool such as yq to extract the Calico YAML information from the generated configuration file, and save it as a new YAML file
+yq r -d'*' my-cluster.yaml stringData.calicoYaml > postcreation_steps.yaml
+
+#Make sure that kubectl is set to the management cluster on which you ran tkg config cluster.
+#Use kubectl apply to deploy the Tanzu Kubernetes cluster from the YAML that you generated with tkg config cluster.
+kubectl apply -f my-cluster.yaml
+#When the cluster is available, set kubectl to the newly created cluster.
+#Run kubectl apply on the YAML that you created with yq, to enable Calico in the cluster.
+kubectl apply -f postcreation_steps.yaml
+
 # Run the tkg create cluster command with the --config option, specifying the modified config.yaml file.
 tkg create cluster my-cluster --plan dev --config cluster-config.yaml
 
