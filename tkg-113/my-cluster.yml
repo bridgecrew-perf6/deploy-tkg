@@ -1,7 +1,7 @@
 apiVersion: cluster.x-k8s.io/v1alpha3
 kind: Cluster
 metadata:
-  name: my-cluster
+  name: workload1
   namespace: default
 spec:
   clusterNetwork:
@@ -14,18 +14,18 @@ spec:
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
     kind: KubeadmControlPlane
-    name: my-cluster-control-plane
+    name: workload1-control-plane
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: VSphereCluster
-    name: my-cluster
+    name: workload1
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: HAProxyLoadBalancer
 metadata:
   labels:
-    cluster.x-k8s.io/cluster-name: my-cluster
-  name: my-cluster-default
+    cluster.x-k8s.io/cluster-name: workload1
+  name: workload1-default
   namespace: default
 spec:
   user:
@@ -51,7 +51,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: VSphereCluster
 metadata:
-  name: my-cluster
+  name: workload1
   namespace: default
 spec:
   cloudProviderConfiguration:
@@ -86,13 +86,13 @@ spec:
   loadBalancerRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: HAProxyLoadBalancer
-    name: my-cluster-default
+    name: workload1-default
   server: 192.168.1.80
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: VSphereMachineTemplate
 metadata:
-  name: my-cluster-control-plane
+  name: workload1-control-plane
   namespace: default
 spec:
   template:
@@ -115,7 +115,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: VSphereMachineTemplate
 metadata:
-  name: my-cluster-worker
+  name: workload1-worker
   namespace: default
 spec:
   template:
@@ -138,13 +138,13 @@ spec:
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
 kind: KubeadmControlPlane
 metadata:
-  name: my-cluster-control-plane
+  name: workload1-control-plane
   namespace: default
 spec:
   infrastructureTemplate:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: VSphereMachineTemplate
-    name: my-cluster-control-plane
+    name: workload1-control-plane
   kubeadmConfigSpec:
     clusterConfiguration:
       apiServer:
@@ -204,7 +204,7 @@ spec:
 apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
 kind: KubeadmConfigTemplate
 metadata:
-  name: my-cluster-md-0
+  name: workload1-md-0
   namespace: default
 spec:
   template:
@@ -233,44 +233,44 @@ apiVersion: cluster.x-k8s.io/v1alpha3
 kind: MachineDeployment
 metadata:
   labels:
-    cluster.x-k8s.io/cluster-name: my-cluster
-  name: my-cluster-md-0
+    cluster.x-k8s.io/cluster-name: workload1
+  name: workload1-md-0
   namespace: default
 spec:
-  clusterName: my-cluster
-  replicas: 10
+  clusterName: workload1
+  replicas: 3
   selector:
     matchLabels:
-      cluster.x-k8s.io/cluster-name: my-cluster
+      cluster.x-k8s.io/cluster-name: workload1
   template:
     metadata:
       labels:
-        cluster.x-k8s.io/cluster-name: my-cluster
-        node-pool: my-cluster-worker-pool
+        cluster.x-k8s.io/cluster-name: workload1
+        node-pool: workload1-worker-pool
     spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
           kind: KubeadmConfigTemplate
-          name: my-cluster-md-0
-      clusterName: my-cluster
+          name: workload1-md-0
+      clusterName: workload1
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
         kind: VSphereMachineTemplate
-        name: my-cluster-worker
+        name: workload1-worker
       version: v1.18.6+vmware.1
 ---
 apiVersion: cluster.x-k8s.io/v1alpha3
 kind: MachineHealthCheck
 metadata:
-  name: my-cluster
+  name: workload1
   namespace: default
 spec:
-  clusterName: my-cluster
+  clusterName: workload1
   nodeStartupTimeout: 20m
   selector:
     matchLabels:
-      node-pool: my-cluster-worker-pool
+      node-pool: workload1-worker-pool
   unhealthyConditions:
   - status: Unknown
     timeout: 5m
@@ -282,7 +282,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: my-cluster-postcreate
+  name: workload1-postcreate
   namespace: default
 stringData:
   calicoYaml: |

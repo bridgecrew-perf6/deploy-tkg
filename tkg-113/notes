@@ -1,1 +1,37 @@
+# To include the management cluster in the output of tkg get cluster, specify the --include-management-cluster option.
+tkg get cluster --include-management-cluster
+tkg get management-cluster
+tkg get mc
+
+# Obtain Tanzu Kubernetes Cluster Credentials
+tkg get credentials my-cluster --namespace=my-namespace
+
+# To save the credentials in a separate kubeconfig file
+tkg get credentials my-cluster --export-file my-cluster-credentials
+
+# build tkg work load cluster
 tkg config cluster my-cluster --plan=prod --controlplane-machine-count=3 --worker-machine-count=10
+
+# Create yaml file for workload cluster deployment
+tkg create cluster my-cluster --plan dev --dry-run > my-cluster-config.yaml
+tkg config cluster mj-tkgc01 --plan dev --controlplane-machine-count 1 --worker-machine-count 3 --namespace development --controlplane-size small --worker-size small > dev.yaml
+
+# Run the tkg create cluster command with the --config option, specifying the modified config.yaml file.
+tkg create cluster my-cluster --plan dev --config cluster-config.yaml
+
+# Create Workload Cluster
+tkg create cluster mj-tkgc01 --manifest dev.yaml
+
+#  To deploy clusters with multiple worker nodes, specify the --worker-machine-count option
+tkg create cluster my-dev-cluster --plan dev --worker-machine-count 3 --namespace my_namespace
+
+# vSphere: extra-large, large, medium, or small. For example:
+tkg create cluster cluster_name --plan prod --controlplane-machine-count 5 --worker-machine-count 10 --size large
+tkg create cluster cluster_name --plan prod --controlplane-machine-count 5 --worker-machine-count 10 --controlplane-size large --worker-size extra-large --haproxy-size small
+
+# Amazon EC2: i3.xlarge, r4.8xlarge, m5a.4xlarge, m5a.2xlarge, m5.xlarge, m5.large, t3.xlarge, t3.large, t3.medium, or t3.small. For example:
+tkg create cluster cluster_name --plan prod --controlplane-machine-count 5 --worker-machine-count 10 --size m5.large
+tkg create cluster cluster_name --plan prod --controlplane-machine-count 5 --worker-machine-count 10 --controlplane-size m5.large --worker-size t3.xlarge
+
+
+
