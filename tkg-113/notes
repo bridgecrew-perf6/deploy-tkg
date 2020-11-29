@@ -1,0 +1,1 @@
+tkg config cluster my-cluster --plan=prod --controlplane-machine-count=3 --worker-machine-count=10
